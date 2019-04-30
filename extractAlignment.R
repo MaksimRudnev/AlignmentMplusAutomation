@@ -1,4 +1,4 @@
-function(file = "alignment.out", silent = FALSE) {
+extractAlignment <-  function(file = "alignment.out", silent = FALSE) {
   
   
   # Basic extraction function  
