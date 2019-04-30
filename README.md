@@ -4,7 +4,8 @@ Three functions that facilitate setting up (frequentist) alignmnet in Mplus, ext
 
 Installation: 
 ```
-source("https://gist.githubusercontent.com/MaksimRudnev/b0bfc0d1a7222407beddeead60b435b8/raw/b675ed33666308c0f14db493177cab56759109b5/MplusAlignmentManipulation.R")
+source('https://raw.githubusercontent.com/MaksimRudnev/AlignmentMplusAutomation/master/source_repo.R')
+
 ```
 
 ## runAlignment
