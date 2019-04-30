@@ -1,4 +1,4 @@
-extractAlignment <- function(file = "alignment.out", silent = FALSE) {
+function(file = "alignment.out", silent = FALSE) {
   
   
   # Basic extraction function  
@@ -17,11 +17,14 @@ extractAlignment <- function(file = "alignment.out", silent = FALSE) {
   
   # Extract pairwise comparisons ########
   
+  # extract alignment part
   align.outp <- extractBetween("ALIGNMENT OUTPUT", "Average Invariance index", b.string)
+  #separate intercepts/thresholds and loadings
   align.outp <-strsplit(align.outp, "Loadings\n")[[1]]
+  # drop first header
   align.outp <- sub("\n\nINVARIANCE ANALYSIS\n\n Intercepts/Thresholds\n ", " ", align.outp)
   
-  al.pw.i <- strsplit(align.outp[1], "Intercept for ")[[1]]
+  al.pw.i <- strsplit(align.outp[1], "Intercept for |Threshold ")[[1]]
   al.pw.l <- unlist(strsplit(align.outp[2:length(align.outp)], "Loadings for "))
   
   # this is reqired to name the fit contribution
@@ -38,9 +41,13 @@ extractAlignment <- function(file = "alignment.out", silent = FALSE) {
   al.pw.i <-al.pw.i[!al.pw.i %in% c(" ",NA,"")]
   al.pw.l <-al.pw.l[!al.pw.l %in% c(" ",NA,"")]
   
+  al.pw.i.names1 <- sapply(1:length(al.pw.i), function(b) substr( al.pw.i[b], 1, regexpr("\n", al.pw.i[b])-1))
+  al.pw.i.names2 <- sapply(al.pw.i.names1, function(nmz) ifelse( grepl("\\$", nmz), "Threshold", "Intercept"))
   
-  al.pw <- c(paste("Intercepts", al.pw.i), paste("Loadings", al.pw.l))
+  al.pw <- c(paste(al.pw.i.names2, al.pw.i), paste("Loadings", al.pw.l))
   al.pw.names <- sapply(1:length(al.pw), function(b) substr( al.pw[b], 1, regexpr("\n", al.pw[b])-1))
+  
+  
   
   al.pw.list <-strsplit(al.pw, " Approximate Measurement Invariance Holds For Groups:")
   names(al.pw.list)<- al.pw.names
@@ -120,7 +127,7 @@ extractAlignment <- function(file = "alignment.out", silent = FALSE) {
     tech8 <-  substr(tech8, 1, regexpr("(\n\n\n)", tech8))
     tech8.align <- strsplit(tech8, "ALIGNMENT RESULTS FOR ")[[1]][-1]
     
-    
+    # This
     fit.contrib <- lapply(1:length(tech8.align), function(x) {
       
       f.contrib.l <-  sub(".* Fit Function Loadings Contribution By Variable *(.*?) *Fit Function Loadings Contribution By Group.*", "\\1", tech8.align[[x]])
@@ -128,16 +135,28 @@ extractAlignment <- function(file = "alignment.out", silent = FALSE) {
       
       contrib <- c(unlist(read.table(text=f.contrib.i)), unlist(read.table(text=f.contrib.l)))
       
-      names(contrib) <- c( paste("Intercepts", loading.names.by.factor[[x]]), paste("Loadings", loading.names.by.factor[[x]]) )
+      names(contrib) <- c( #paste("Intercepts", loading.names.by.factor[[x]]),
+        paste(al.pw.i.names2, al.pw.i.names1), 
+        #     paste("Loadings", loading.names.by.factor[[x]])
+        paste("Loadings", gsub("\\$.*", "", al.pw.i.names1))
+      )
       contrib
     })
     
     
     f.names <- sapply(tech8.align, function(x) substr(x, 1, regexpr("\n", x)-1))
     
+    fit <- data.frame(Fit.contribution = unlist(fit.contrib),
+                      Factor = rep(unname(f.names), lengths(fit.contrib)),
+                      stringsAsFactors = FALSE)
     
-    output$summary <- merge(summ, data.frame(Fit.contribution = unlist(fit.contrib),
-                                             Factor = rep(unname(f.names), lengths(fit.contrib)), stringsAsFactors = FALSE), by = "row.names")
+    fit <- aggregate(fit,  list(names(unlist(fit.contrib))), function(x) x[1])
+    rownames(fit) <- fit$Group.1
+    
+    
+    
+    output$summary <- merge(summ, fit[,-1], 
+                            by = "row.names")
     output$summary <- output$summary[order(output$summary$Factor),]
   }
   
