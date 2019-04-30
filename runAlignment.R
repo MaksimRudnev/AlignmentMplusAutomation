@@ -56,7 +56,7 @@ runAlignment <- function(
                   "\n",
                   paste("CATEGORICAL = ", paste(categorical, collapse = " "))
                   ),
-           
+           ";\n",
            "classes = c(", length(list.of.groups), ");\n",
            "knownclass = c(", #group, " = ", 
            
