@@ -52,9 +52,10 @@ runAlignment <- function(
            " VARIABLE:", "\n",
            "   NAMES =", group, " ", paste(var.list, collapse=" "), ";\n",
            "   MISSING=.;", "\n",
-           ifelse(!any(is.null(categorical)),
-                  paste("CATEGORICAL = ", paste(categorical, collapse = " ")),
-                  "\n"),
+           ifelse(any(is.null(categorical)),
+                  "\n",
+                  paste("CATEGORICAL = ", paste(categorical, collapse = " "))
+                  ),
            
            "classes = c(", length(list.of.groups), ");\n",
            "knownclass = c(", #group, " = ", 
