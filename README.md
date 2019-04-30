@@ -49,4 +49,9 @@ It has a single argument which is a vector of Mplus output files containing resu
 See the tutorial on measurement invariance alignmnet in Mplus : https://maksimrudnev.com/2019/04/20/alignment-tutorial/ 
 
 Use freely and credit as 
-> Rudnev M.(2019) Alignment measurement invariance: Tutorial. URL: https://maksimrudnev.com/2019/04/20/alignment-tutorial/  
+> Rudnev M.(2019) Alignment measurement invariance: Tutorial. URL: https://maksimrudnev.com/2019/04/20/alignment-tutorial/ 
+
+
+---
+
+See [example](Example.md)
