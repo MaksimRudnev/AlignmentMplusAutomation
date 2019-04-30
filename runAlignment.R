@@ -48,38 +48,36 @@ runAlignment <- function(
   
   
   inp <- c("DATA:","\n",
-           "   FILE = 'mplus_temp.tab';", "\n",
+           "   file = 'mplus_temp.tab';", "\n",
            " VARIABLE:", "\n",
-           "   NAMES =", group, " ", paste(var.list, collapse=" "), ";\n",
-           "   MISSING=.;", "\n",
+           "   names =", group, " ", paste(var.list, collapse=" "), ";\n",
+           "   missing = .;", "\n",
            ifelse(any(is.null(categorical)),
                   "\n",
-                  paste("CATEGORICAL = ", paste(categorical, collapse = " "))
+                  paste("   categorical = ", paste(categorical, collapse = " "))
                   ),
            ";\n",
-           "classes = c(", length(list.of.groups), ");\n",
-           "knownclass = c(", #group, " = ", 
+           "   classes = c(", length(list.of.groups), ");\n",
+           "   knownclass = c(", paste0(group, " = ", list.of.groups, " \n    ", collapse=""),
            
-           # if(is.numeric(dat[,group])) {
-           paste0(group, " = ", list.of.groups, " \n", collapse="") 
-           # } else {
-           #   paste0(group, " = '", list.of.groups, "' \n", collapse="")
-           # }
-           ,
-           
-           ");\n",
+           ");\n\n",
            
            "ANALYSIS:\n",
            "  type = mixture;\n",
            "  estimator = ml;\n",
            "  alignment =", kind = "", ";\n", 
            ifelse(any(is.null(categorical)),
-                  "\n",  "ALGORITHM=INTEGRATION;\n"),
+                  "\n",  
+                  "  algorithm = integration;\n\n"),
            
            "MODEL:\n",
            "  %OVERALL%\n",
-           model, "\n",
-           "OUTPUT: align tech8 SVALUES;", "\n",
+           model, 
+           "\n\n",
+           
+           "OUTPUT: align tech8 SVALUES;", 
+           "\n\n",
+           
            "SAVEDATA: ", "\n",
            "  RANKING = ranking.dat; "
            
