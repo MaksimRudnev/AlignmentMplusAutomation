@@ -2,6 +2,7 @@ runAlignment <- function(
   model = "Moral BY prostit homosex abortion divorce;", 
   group = "country",
   dat = wvs.s, 
+  categorical = NULL,
   sim.samples = c(100, 500, 1000), # can be NULL to avoid simulations
   sim.reps = 500,
   Mplus_com = "Mplus",
@@ -51,6 +52,9 @@ runAlignment <- function(
            " VARIABLE:", "\n",
            "   NAMES =", group, " ", paste(var.list, collapse=" "), ";\n",
            "   MISSING=.;", "\n",
+           ifelse(!any(is.null(categorical)),
+                  paste("CATEGORICAL = ", paste(categorical, collapse = " ")),
+                  "\n"),
            
            "classes = c(", length(list.of.groups), ");\n",
            "knownclass = c(", #group, " = ", 
