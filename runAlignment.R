@@ -73,6 +73,8 @@ runAlignment <- function(
            "  type = mixture;\n",
            "  estimator = ml;\n",
            "  alignment =", kind = "", ";\n", 
+           ifelse(any(is.null(categorical)),
+                  "\n",  "ALGORITHM=INTEGRATION;\n"),
            
            "MODEL:\n",
            "  %OVERALL%\n",
