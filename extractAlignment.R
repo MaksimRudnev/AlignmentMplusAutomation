@@ -1,4 +1,4 @@
-extractAlignment <-  function(file = "alignment.out", silent = FALSE) {
+extractAlignment <-  function(file = "alignment.out", silent = FALSE, nice.tables = FALSE) {
   
   
   # Basic extraction function  
@@ -100,11 +100,9 @@ extractAlignment <-  function(file = "alignment.out", silent = FALSE) {
   })
   rownames(non.invariant.groups.pars.tab)<-all.groups
   
-  output[["non.invariant.pars"]] <- non.invariant.groups.pars.tab
-  # 
-  #  knitr::kable(non.invariant.groups.pars.tab, format = "html") %>%
-  #  kableExtra::kable_styling(., bootstrap_options=c("striped", "bordered"), position = "left", font_size = 12)
+  output[["non.invariant.pars"]] <- t(non.invariant.groups.pars.tab)
   
+ 
   
   # Extract summaries: R2, aligned parameters, list of invariant and non-invariant groups #####
   
@@ -187,20 +185,29 @@ extractAlignment <-  function(file = "alignment.out", silent = FALSE) {
     
     rankingFile <- sub(".*Factor Mean Ranking Tables *(.*?) *Save format.*", "\\1", b.string)
     rankingFile <- gsub("Save file|\n| ", "", rankingFile)
-    ranking.tabs <- paste(readLines(paste0(substr(file, 1, regexpr("/.*$", file)), rankingFile)), collapse="\n")
-    ranking.tabs <- strsplit(ranking.tabs, "Ranking table for ")[[1]][-1]
-    names(ranking.tabs)<- sapply(ranking.tabs, function(x) substr(x, 1, regexpr("\n", x)-1))
-    ranking.tab <- lapply(ranking.tabs, function(x) {
-      rt <- read.csv(text=x, skip=2, row.names = 1)
-      colnames(rt)<- rownames(rt)
-      rt[,-ncol(rt)]
-    })
+    rankingFileName <- paste0(substr(file, 1, regexpr("/.*$", file)), rankingFile)
+    if(file.exists(rankingFileName)) {
+     ranking.tabs <- paste(readLines(rankingFileName), collapse="\n")
+     ranking.tabs <- strsplit(ranking.tabs, "Ranking table for ")[[1]][-1]
+     names(ranking.tabs)<- sapply(ranking.tabs, function(x) substr(x, 1, regexpr("\n", x)-1))
+     ranking.tab <- lapply(ranking.tabs, function(x) {
+       rt <- read.csv(text=x, skip=2, row.names = 1)
+       colnames(rt)<- rownames(rt)
+       rt[,-ncol(rt)]
+     })
     
     
     output[["ranking.table"]] <-ranking.tab
-  }
+    } else {
+      message("Could not find ranking file.")
+    }
+    }
   
   
   if(!silent) print(output$summary, row.names=FALSE)
+  if(nice.tables && !silent) {
+    nice.tab1 <- knitr::kable(output$non.invariant.pars, format = "html")
+   trash <-  capture.output(kableExtra::kable_styling(nice.tab1, bootstrap_options=c("striped", "bordered"), position = "left", font_size = 12))
+  }
   invisible(output)
 }

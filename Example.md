@@ -3,6 +3,7 @@
 <strong>> runAlignment(model = "Moral1 BY prostit homosex abortion divorce;
                       Moral2 BY benefits taxes bribes;", 
              group = "country",
+             categorical = NULL,
              dat = wvs.s1,
              sim.samples = c(50, 100, 500),
              Mplus_com = "wine mplus",
@@ -76,7 +77,7 @@ $MORAL2
 10 < < < < < < < <    X
 
 
-<strong>> print(t(fixed$non.invariant.pars), quote=F) </strong>
+<strong>> print(fixed$non.invariant.pars, quote=F) </strong>
                     2 3 4 5 6 10 7 9 8 1
 Intercepts PROSTIT                   X X
 Intercepts HOMOSEX  X X   X          X  

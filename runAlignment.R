@@ -7,7 +7,8 @@ runAlignment <- function(
   sim.reps = 500,
   Mplus_com = "Mplus",
   path = getwd(),
-  summaries = FALSE) {
+  summaries = FALSE
+) {
   
   oldwd <- getwd()
   setwd(path)
@@ -45,7 +46,7 @@ runAlignment <- function(
   
   
   list.of.groups = unique(as.matrix(d[,1]))
-  
+  ngroups = length(list.of.groups)
   
   inp <- c("DATA:","\n",
            "   file = 'mplus_temp.tab';", "\n",
@@ -55,9 +56,9 @@ runAlignment <- function(
            ifelse(any(is.null(categorical)),
                   "\n",
                   paste("   categorical = ", paste(categorical, collapse = " "))
-                  ),
+           ),
            ";\n",
-           "   classes = c(", length(list.of.groups), ");\n",
+           "   classes = c(", ngroups, ");\n",
            "   knownclass = c(", paste0(group, " = ", list.of.groups, " \n    ", collapse=""),
            
            ");\n\n",
@@ -88,7 +89,7 @@ runAlignment <- function(
   inp["kind"]<-"FREE"
   cat(inp, file = "free.inp", sep="")
   message("Run free in Mplus.")
-  trash <- system(paste(Mplus_com, "free.inp"))
+  #  trash <- system(paste(Mplus_com, "free.inp"))
   
   
   outFree <- paste(readLines("free.out"), collapse = "\n") 
@@ -105,7 +106,7 @@ runAlignment <- function(
   inp["kind"]<-paste0("FIXED(", refGroup, ")")
   cat(inp, file = "fixed.inp", sep="")
   message("Run fixed in Mplus.")
-  trash <- system(paste(Mplus_com, "fixed.inp"))
+  # trash <- system(paste(Mplus_com, "fixed.inp"))
   
   # Creating simulations
   if(!is.null(sim.samples)) {
@@ -115,7 +116,6 @@ runAlignment <- function(
     
     stValues <- sub(".*MODEL COMMAND WITH FINAL ESTIMATES USED AS STARTING VALUES *(.*?) *\n\n\n\n.*", "\\1", outFixed)
     stValues <- gsub("%C#", "%g#", stValues)
-    
     stValues <- gsub("c#", "g#", stValues)
     
     corrupt.code <- sub(".*%OVERALL% *(.*?) *%g#1%.*", "\\1", stValues)
@@ -125,22 +125,46 @@ runAlignment <- function(
     
     stValues <- paste(paste(correction, collapse="\n"), "\n", substr(stValues, regexpr("%g#1%", stValues), nchar(stValues)))
     
+    if(!any(is.null(categorical))) {
+      g1 <- sub(".*%g#1% *(.*?) *%g#2%.*", "\\1", stValues)
+      g1 <- strsplit(g1, "\n")[[1]]
+      g1 <- g1[grep("\\[", g1)]
+      g1 <- g1[grep("\\$", g1)]
+      g1 <- sapply(g1 , function(x)   sub(" *\\[ *(.*?) *\\$.*", "\\1", x))
+      gen.cat <- paste0(names(table(g1)), " (", table(g1), ")")
+    }
+    
+    
+    
+    
     for(x in sim.samples) { 
-      code <- c("  MONTECARLO:
-                NAMES = ", paste(var.list, collapse = " "), ";\n",
-                "ngroups = ", ngroups, ";\n", 
-                "NOBSERVATIONS =", ngroups, "(", x, ");\n", 
-                "NREPS =", sim.reps, ";\n\n",
-                "ANALYSIS:
-                TYPE = MIXTURE;
-                ESTIMATOR = ml;
-                alignment = fixed;\n",
+      code <- c("MONTECARLO:",
+                " NAMES = ", paste(var.list, collapse = " "), ";\n",
+                " ngroups = ", ngroups, ";\n", 
+                " NOBSERVATIONS =", ngroups, "(", x, ");\n", 
+                " NREPS =", sim.reps, ";\n\n",
+                ifelse(any(is.null(categorical)),
+                       "\n",  
+                       paste(
+                         " CATEGORICAL =", paste(categorical, collapse = " "), ";\n", 
+                         " GENERATE = ", paste(gen.cat, collapse = " "),
+                         ";\n\n"  )),
                 
-                "MODEL POPULATION:
-                %OVERALL%\n",
+                
+                
+                "ANALYSIS:",
+                " TYPE = MIXTURE;",
+                " ESTIMATOR = ml;",
+                " alignment = fixed;\n",
+                ifelse(any(is.null(categorical)),
+                       "\n",  
+                       " algorithm = integration;\n\n"),
+                
+                "MODEL POPULATION:",
+                " %OVERALL%\n",
                 paste(stValues, collapse="\n"),
-                "\nMODEL:
-                %OVERALL%\n",
+                "\nMODEL:",
+                " %OVERALL%\n",
                 paste(stValues, collapse="\n")
       )
       cat(code, sep="", file = paste0("sim", x , ".inp"))

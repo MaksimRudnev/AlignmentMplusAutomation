@@ -15,6 +15,7 @@ runAlignment(
   model,                           # Formula in Mplus format
   group,                           # Grouping variable
   dat,                             # Data object 
+  categorical = NULL,              # Vector of indicators that are binary or ordinal
   sim.samples = c(100, 500, 1000), # Group sample sizes for simulation, 
                                    #  the length of this vector also determines 
                                    #  a number of simulation studies.
