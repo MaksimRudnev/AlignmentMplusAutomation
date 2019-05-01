@@ -28,7 +28,7 @@ runAlignment(
                                    #   be run after all the Mplus work is done.
   )
 </pre>
-This function will set up and run free alignment, then it will set up and run fixed alignment using the smallest mean from the free alignmnet output. optionally, it will also set up and run simulations as recommended by Muthen & Asparouhov (2014).
+This function will set up and run free alignment, then it will set up and run fixed alignment using the smallest mean from the free alignmnet output. Optionally, it will also set up and run simulations as recommended by Muthen & Asparouhov (2014).
 
 ## extractAlignment
 ```
