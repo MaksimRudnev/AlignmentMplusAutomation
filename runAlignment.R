@@ -89,7 +89,7 @@ runAlignment <- function(
   inp["kind"]<-"FREE"
   cat(inp, file = "free.inp", sep="")
   message("Run free in Mplus.")
-  #  trash <- system(paste(Mplus_com, "free.inp"))
+  trash <- system(paste(Mplus_com, "free.inp"))
   
   
   outFree <- paste(readLines("free.out"), collapse = "\n") 
@@ -106,7 +106,7 @@ runAlignment <- function(
   inp["kind"]<-paste0("FIXED(", refGroup, ")")
   cat(inp, file = "fixed.inp", sep="")
   message("Run fixed in Mplus.")
-  # trash <- system(paste(Mplus_com, "fixed.inp"))
+  trash <- system(paste(Mplus_com, "fixed.inp"))
   
   # Creating simulations
   if(!is.null(sim.samples)) {
