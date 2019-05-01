@@ -35,7 +35,7 @@ extractAlignmentSim <- function(sim.outputs = c("sim500.out", "sim100.out", "sim
   
   if(!silent) { 
     
-    for(i in colnames(otp[[3]][[2]])  ) {
+    for(i in colnames(otp[[1]][[1]])  ) {
       cat("\n", "⎯⎯⎯⎯⎯⎯⎯⎯⎯ ", i," ", rep("⎯", getOption("width", 80)-nchar(i)-2),  "\n", sep="") 
       print(sapply(otp, function(x) x[[1]][,i] ), digits = 2)
       print(sapply(otp, function(x) x[[2]][,i] ), digits = 2)
