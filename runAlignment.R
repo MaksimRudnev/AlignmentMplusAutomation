@@ -55,9 +55,9 @@ runAlignment <- function(
            "   missing = .;", "\n",
            ifelse(any(is.null(categorical)),
                   "\n",
-                  paste("   categorical = ", paste(categorical, collapse = " "))
+                  paste("   categorical = ", paste(categorical, collapse = " "), ";\n")
            ),
-           ";\n",
+           
            "   classes = c(", ngroups, ");\n",
            "   knownclass = c(", paste0(group, " = ", list.of.groups, " \n    ", collapse=""),
            
