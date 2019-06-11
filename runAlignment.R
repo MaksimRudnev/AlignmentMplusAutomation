@@ -197,8 +197,6 @@ runAlignment <- function(
       print(otpt$simulations)
       
       
-      invisible(otpt)
-      
       
     } else {
       otpt <- list(fixed = extractAlignment("fixed.out", silent = TRUE),
@@ -211,7 +209,7 @@ runAlignment <- function(
       cat("\n", "⎯⎯⎯⎯⎯⎯⎯⎯⎯ ", "Results of Fixed alignemnt", rep("⎯", getOption("width", 80)-20),  "\n", sep="") 
       print(otpt$fixed$summary)
       
-      invisible(otpt)
+      
     }
     
   } else {
@@ -219,5 +217,5 @@ runAlignment <- function(
   }
   
   setwd(oldwd)
-  
+  invisible(otpt)
 }
