@@ -35,7 +35,7 @@ runAlignment <- function(
   
   if(!is.numeric(d[,group])) {
     #d[,group] <- gsub(" ", "_", as.character( d[,group] )  )
-    warning("The group variable must be numeric!")
+    message("The group variable must be numeric!")
     
   }
   
