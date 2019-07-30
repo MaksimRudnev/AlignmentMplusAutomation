@@ -22,6 +22,7 @@ runAlignment <- function(
   var.list <- paste(unique(unlist(var.list)), collapse=" ")
   var.list <- strsplit(var.list, " ")[[1]]
   var.list <-   var.list[!var.list==""]
+  var.list <- gsub("\\.", "_", var.list)
   
   # var.list <- paste0("; ", model, " ;")
   # var.list<- gsub("\n", ";", var.list)
