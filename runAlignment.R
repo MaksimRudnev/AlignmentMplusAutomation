@@ -187,7 +187,7 @@ runAlignment <- function(
       
       otpt <- list(fixed= extractAlignment("fixed.out", silent = TRUE),
                    free = extractAlignment("free.out", silent = TRUE),
-                   simulations = extractAlignmentSim(sapply(sim.samples, paste0("sim", x, ".inp")), silent = TRUE)
+                   simulations = extractAlignmentSim(sapply(sim.samples, function(x) paste0("sim", x, ".out")), silent = TRUE)
       )
       cat("\n", "⎯⎯⎯⎯⎯⎯⎯⎯⎯ ", "Results of Free alignemnt", rep("⎯", getOption("width", 80)-20),  "\n", sep="")
       print(otpt$free$summary)
