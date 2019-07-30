@@ -22,7 +22,7 @@ runAlignment <- function(
   var.list <- paste(unique(unlist(var.list)), collapse=" ")
   var.list <- strsplit(var.list, " ")[[1]]
   var.list <-   var.list[!var.list==""]
-  var.list <- gsub("\\.", "_", var.list)
+  
   
   # var.list <- paste0("; ", model, " ;")
   # var.list<- gsub("\n", ";", var.list)
@@ -45,6 +45,7 @@ runAlignment <- function(
   
   write.table(d, "mplus_temp.tab", quote=F, sep="\t", row.names=F, col.names=F, na=".")
   
+  #var.list <- gsub("\\.", "_", var.list)
   
   list.of.groups = unique(as.matrix(d[,1]))
   ngroups = length(list.of.groups)
@@ -52,7 +53,7 @@ runAlignment <- function(
   inp <- c("DATA:","\n",
            "   file = 'mplus_temp.tab';", "\n",
            " VARIABLE:", "\n",
-           "   names =", group, " ", paste(var.list, collapse=" "), ";\n",
+           "   names =", gsub("\\.", "_", group), " ", paste(gsub("\\.", "_", var.list), collapse=" "), ";\n",
            "   missing = .;", "\n",
            ifelse(any(is.null(categorical)),
                   "\n",
@@ -60,7 +61,7 @@ runAlignment <- function(
            ),
            
            "   classes = c(", ngroups, ");\n",
-           "   knownclass = c(", paste0(group, " = ", list.of.groups, " \n    ", collapse=""),
+           "   knownclass = c(", paste0(gsub("\\.", "_", group), " = ", list.of.groups, " \n    ", collapse=""),
            
            ");\n\n",
            
@@ -140,7 +141,7 @@ runAlignment <- function(
     
     for(x in sim.samples) { 
       code <- c("MONTECARLO:",
-                " NAMES = ", paste(var.list, collapse = " "), ";\n",
+                " NAMES = ", paste(gsub("\\.", "_", var.list), collapse = " "), ";\n",
                 " ngroups = ", ngroups, ";\n", 
                 " NOBSERVATIONS =", ngroups, "(", x, ");\n", 
                 " NREPS =", sim.reps, ";\n\n",
