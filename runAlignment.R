@@ -219,5 +219,5 @@ runAlignment <- function(
   }
   
   setwd(oldwd)
-  invisible(otpt)
+  if(summaries) invisible(otpt)
 }

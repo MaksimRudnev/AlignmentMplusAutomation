@@ -1,4 +1,4 @@
-extractAlignment <-  function(file = "alignment.out", silent = FALSE, nice.tables = FALSE) {
+extractAlignment <-  function(file = "fixed.out", silent = FALSE, nice.tables = FALSE) {
   
   
   # Basic extraction function  
@@ -125,37 +125,56 @@ extractAlignment <-  function(file = "alignment.out", silent = FALSE, nice.table
     tech8 <-  substr(tech8, 1, regexpr("(\n\n\n)", tech8))
     tech8.align <- strsplit(tech8, "ALIGNMENT RESULTS FOR ")[[1]][-1]
     
-    # This
-    fit.contrib <- lapply(1:length(tech8.align), function(x) {
-      
-      f.contrib.l <-  sub(".* Fit Function Loadings Contribution By Variable *(.*?) *Fit Function Loadings Contribution By Group.*", "\\1", tech8.align[[x]])
-      f.contrib.i <-  sub(".* Fit Function Intercepts Contribution By Variable *(.*?) *Fit Function Intercepts Contribution By Group.*", "\\1", tech8.align[[x]])
-      
-      contrib <- c(unlist(read.table(text=f.contrib.i)), unlist(read.table(text=f.contrib.l)))
-      
-      names(contrib) <- c( #paste("Intercepts", loading.names.by.factor[[x]]),
-        paste(al.pw.i.names2, al.pw.i.names1), 
-        #     paste("Loadings", loading.names.by.factor[[x]])
-        paste("Loadings", gsub("\\$.*", "", al.pw.i.names1))
-      )
-      contrib
-    })
-    
-    
+    # turn string output to a table
     f.names <- sapply(tech8.align, function(x) substr(x, 1, regexpr("\n", x)-1))
+      #
+    #fit.contrib <- lapply(1:length(tech8.align), function(x) {
+      
+      f.contrib.l <-  sub(".* Fit Function Loadings Contribution By Variable *(.*?) *Fit Function Loadings Contribution By Group.*", "\\1", tech8.align)
+      f.contrib.i <-  sub(".* Fit Function Intercepts Contribution By Variable *(.*?) *Fit Function Intercepts Contribution By Group.*", "\\1", tech8.align)
+      
+      contrib.i.tab <- read.table(text=f.contrib.i)
+      contrib.l.tab <- read.table(text=f.contrib.l)
+      contrib <- unname(c(unlist(contrib.i.tab), unlist(contrib.l.tab)))
+      
+      # names(contrib) <- c( 
+      #   paste("Intercept", unlist(loading.names.by.factor[[x]])),
+      #   paste("Loadings", loading.names.by.factor[[x]])
+      # )
+      
+     nmz.th.int <- paste(al.pw.i.names2, al.pw.i.names1)
+     nmz.loadings <- al.pw.names[!al.pw.names %in% nmz.th.int]
+     
+      
+     # because Mplus prints duplicates for factor loadings when thresholds are present, we need to drop duplicates
+     if(nrow(contrib.l.tab)>length(nmz.loadings)) {
+       contrib.l.tab <- contrib.l.tab[!duplicated(contrib.l.tab),]
+       contrib <- unname(c(unlist(contrib.i.tab), unlist(contrib.l.tab)))
+     }
+     
+     names(contrib) <- c(nmz.th.int, nmz.loadings)
+     
+     fit.contrib = data.frame(Fit.contribution = contrib, 
+    #             Factor = rep(f.names[1], length(contrib)), 
+    #             row.names = names(contrib),
+                 stringsAsFactors = F)
+   
+   # })
     
-    fit <- data.frame(Fit.contribution = unlist(fit.contrib),
-                      Factor = rep(unname(f.names), lengths(fit.contrib)),
-                      stringsAsFactors = FALSE)
+    # f.names <- sapply(tech8.align, function(x) substr(x, 1, regexpr("\n", x)-1))
+    # 
+    # fit <- data.frame(Fit.contribution = unlist(fit.contrib),
+    #                   Factor = rep(unname(f.names), each=length(f.contrib.l)),
+    #                   stringsAsFactors = FALSE)
+    # 
+    # fit <- aggregate(fit,  list(names(unlist(fit.contrib))), function(x) x[1])
+    # rownames(fit) <- fit$Group.1
     
-    fit <- aggregate(fit,  list(names(unlist(fit.contrib))), function(x) x[1])
-    rownames(fit) <- fit$Group.1
+    #fit.contrib <- Reduce("rbind", fit.contrib)
+    output$summary <- merge(summ, fit.contrib, 
+          by = "row.names")
     
-    
-    
-    output$summary <- merge(summ, fit[,-1], 
-                            by = "row.names")
-    output$summary <- output$summary[order(output$summary$Factor),]
+    output$summary <- output$summary #[order(output$summary$Factor),]
   }
   
   
