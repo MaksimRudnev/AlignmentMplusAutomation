@@ -1,3 +1,8 @@
+# ! This is a legacy page, the functions were moved to the R package MIE 
+
+https://github.com/MaksimRudnev/MIE.package
+
+
 # Automation of alignment in Mplus
 
 Three functions that facilitate setting up (frequentist) alignmnet in Mplus, extracting, and summarizing its results.
